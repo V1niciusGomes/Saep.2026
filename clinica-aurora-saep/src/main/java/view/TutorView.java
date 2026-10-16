@@ -103,8 +103,7 @@ public class TutorView extends JFrame {
             campoEmail.setText("");
             carregar();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Não gravou.
-" + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Não gravou.\n" + ex.getMessage());
         }
     }
 }

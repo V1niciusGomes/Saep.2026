@@ -13,7 +13,7 @@ public final class ConnectionFactory {
     private static final String URL =
             "jdbc:mysql://localhost:3306/saep_db?useSSL=false&serverTimezone=America/Sao_Paulo&allowPublicKeyRetrieval=true";
     private static final String USER = "root";
-    private static final String PASS = "orion";
+    private static final String PASS = "senai";
 
     private ConnectionFactory() {}
 

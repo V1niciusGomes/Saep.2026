@@ -96,10 +96,7 @@ public class LoginView extends JFrame {
             dispose();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
-                "Não conectou no MySQL.
-Confira se o serviço está no ar e a senha em ConnectionFactory.
-
-"
+                "Não conectou no MySQL.\nConfira se o serviço está no ar e a senha em ConnectionFactory.\n\n"
                 + ex.getMessage());
         }
     }
