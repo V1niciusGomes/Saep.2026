@@ -1,5 +1,5 @@
 -- Clínica Vet Aurora — SAEP Final (Semana 2)
--- 5 tabelas em 3FN, 3 registros em cada (usuario: só o admin), SHA2, FK, AES no CPF.
+-- 5 tabelas em 3FN, SHA2, FK, AES no CPF. Banco completo + dados de teste.
 -- Rodar no Workbench. Depois: refresh e conferir a contagem no final.
 
 CREATE DATABASE IF NOT EXISTS saep_db
@@ -70,12 +70,14 @@ INSERT INTO usuario (login, senha, nome) VALUES
 INSERT INTO tutor (nome, telefone, email, cpf) VALUES
   ('Ana Souza',    '48999990001', 'ana.souza@email.com',    AES_ENCRYPT('11122233344', 'SENAI2026')),
   ('Bruno Lima',   '48999990002', 'bruno.lima@email.com',   AES_ENCRYPT('22233344455', 'SENAI2026')),
-  ('Carla Mendes', '48999990003', 'carla.mendes@email.com', AES_ENCRYPT('33344455566', 'SENAI2026'));
+  ('Carla Mendes', '48999990003', 'carla.mendes@email.com', AES_ENCRYPT('33344455566', 'SENAI2026')),
+  ('João Mandela', '48999990004', 'joao.mandela@email.com', AES_ENCRYPT('44455566677', 'SENAI2026'));
 
 INSERT INTO pet (nome, especie, raca, data_nascimento, id_tutor) VALUES
   ('Rex',  'Cão',  'Labrador',  '2020-03-15', 1),
   ('Mimi', 'Gato', 'Siamês',    '2021-07-22', 2),
-  ('Bolt', 'Cão',  'Vira-lata', '2019-11-08', 3);
+  ('Bolt', 'Cão',  'Vira-lata', '2019-11-08', 3),
+  ('Nina', 'Gato', 'Persa',     '2022-01-30', 4);
 
 INSERT INTO veterinario (nome, crmv, especialidade) VALUES
   ('Dra. Helena Costa', 'SC-12345', 'Clínica Geral'),
@@ -85,9 +87,10 @@ INSERT INTO veterinario (nome, crmv, especialidade) VALUES
 INSERT INTO consulta (id_pet, id_veterinario, data_hora, motivo, observacao) VALUES
   (1, 1, '2026-10-20 09:00:00', 'Vacina anual', 'Animal saudável.'),
   (2, 3, '2026-10-21 14:30:00', 'Coceira',      'Receitou pomada.'),
-  (3, 2, '2026-10-22 11:00:00', 'Castração',    'Agendada cirurgia.');
+  (3, 2, '2026-10-22 11:00:00', 'Castração',    'Agendada cirurgia.'),
+  (4, 1, '2026-10-23 16:00:00', 'Check-up',     'Retorno em 30 dias.');
 
--- conferência: 1 usuario e 3 linhas nas outras 4 tabelas
+-- conferência: 1 usuario, 4 tutores, 4 pets, 3 vets e 4 consultas
 SELECT 'usuario' AS tabela, COUNT(*) AS qtd FROM usuario
 UNION ALL SELECT 'tutor',       COUNT(*) FROM tutor
 UNION ALL SELECT 'pet',         COUNT(*) FROM pet
