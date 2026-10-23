@@ -1,0 +1,7 @@
+# Artefatos de build do Maven
+target/
+
+# Metadados de IDE
+.vscode/
+*.iml
+.idea/
