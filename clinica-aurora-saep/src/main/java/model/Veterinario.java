@@ -1,10 +1,20 @@
 package model;
 
-/** Transporta dado. Não abre conexão. */
+/**
+ * Veterinario — model de um cadastro simples e independente.
+ *
+ * PAPEL NA ARQUITETURA (camada model):
+ *   Transporta dados. Não abre conexão, não tem SQL.
+ *   Diferente do Tutor, ele tem o campo "crmv", que no banco é ÚNICO
+ *   (não pode repetir). Isso é uma regra do banco, não deste model.
+ *
+ * [MOLDE] Use como molde para qualquer entidade "de apoio" que outras
+ *         tabelas vão referenciar (ex.: Categoria, Setor, Fornecedor).
+ */
 public class Veterinario {
-    private int id;
+    private int id;                 // id_veterinario (chave primária)
     private String nome;
-    private String crmv;
+    private String crmv;            // [MOLDE] campo único (registro profissional). Troque por "codigo", "sku", etc.
     private String especialidade;
 
     public int getId() { return id; }

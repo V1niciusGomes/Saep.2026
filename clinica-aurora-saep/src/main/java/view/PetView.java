@@ -26,17 +26,35 @@ import dao.TutorDAO;
 import model.Pet;
 import model.Tutor;
 
+/**
+ * PetView — tela de CRUD de uma entidade que PERTENCE A outra (pet tem tutor).
+ * Segue o molde do TutorView, com DUAS novidades:
+ *
+ *   1. JComboBox<Tutor> comboTutor
+ *      Lista de escolha com os tutores. Importante: o combo guarda o OBJETO
+ *      Tutor inteiro (não só o texto), então na hora de salvar pegamos o
+ *      tutor.getId() para gravar na FK. Um "renderer" (lá embaixo) faz o combo
+ *      exibir só o nome do tutor.
+ *
+ *   2. Campo de data (texto "aaaa-mm-dd") convertido para LocalDate com
+ *      parseData(). Se o usuário digitar errado, avisamos sem quebrar.
+ *
+ * [MOLDE] Para uma "entidade filha" (Produto->Categoria): troque o combo de
+ *         Tutor pelo combo da entidade-pai e carregue-o com o DAO do pai.
+ */
 public class PetView extends JFrame {
 
     private final PetDAO dao = new PetDAO();
-    private final TutorDAO tutorDao = new TutorDAO();
+    private final TutorDAO tutorDao = new TutorDAO(); // usado só para encher o combo de tutores
+
     private final JTextField campoBusca = new JTextField(16);
     private final JTextField campoNome = new JTextField();
     private final JTextField campoEspecie = new JTextField();
     private final JTextField campoRaca = new JTextField();
     private final JTextField campoNascimento = new JTextField();
-    private final JComboBox<Tutor> comboTutor = new JComboBox<>();
+    private final JComboBox<Tutor> comboTutor = new JComboBox<>(); // seletor do "dono"
     private int idSelecionado = 0;
+
     private final DefaultTableModel modelo = new DefaultTableModel(
             new String[] { "ID", "Nome", "Espécie", "Raça", "Nascimento", "Tutor" }, 0) {
         @Override public boolean isCellEditable(int r, int c) { return false; }
@@ -48,8 +66,10 @@ public class PetView extends JFrame {
         setSize(820, 540);
         setLocationRelativeTo(null);
 
+        // Faz o combo mostrar o NOME do tutor (e não o endereço do objeto).
         comboTutor.setRenderer(new TutorRenderer());
 
+        // NORTE: busca
         JPanel busca = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton btnBuscar = new JButton("Buscar");
         btnBuscar.addActionListener(e -> carregar());
@@ -60,6 +80,7 @@ public class PetView extends JFrame {
         tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabela.getSelectionModel().addListSelectionListener(e -> preencherSelecionado());
 
+        // SUL: formulário (note o combo de tutor na última linha)
         JPanel form = new JPanel(new GridLayout(5, 2, 8, 8));
         form.setBorder(BorderFactory.createTitledBorder("Dados do pet"));
         form.add(new JLabel("Nome"));
@@ -100,18 +121,20 @@ public class PetView extends JFrame {
         add(sul, BorderLayout.SOUTH);
 
         getRootPane().setDefaultButton(btnBuscar);
-        carregarTutores();
+        carregarTutores(); // enche o combo ANTES de carregar a tabela
         carregar();
     }
 
+    /** Preenche o combo com todos os tutores do banco. */
     private void carregarTutores() {
         DefaultComboBoxModel<Tutor> cm = new DefaultComboBoxModel<>();
-        for (Tutor t : tutorDao.listar("")) {
-            cm.addElement(t);
+        for (Tutor t : tutorDao.listar("")) { // "" = traz todos
+            cm.addElement(t); // guarda o Tutor inteiro (com id) em cada item
         }
         comboTutor.setModel(cm);
     }
 
+    /** READ — carrega os pets na tabela. */
     private void carregar() {
         modelo.setRowCount(0);
         List<Pet> lista = dao.listar(campoBusca.getText());
@@ -122,6 +145,7 @@ public class PetView extends JFrame {
         limpar();
     }
 
+    /** Copia a linha clicada para o formulário (e seleciona o tutor no combo). */
     private void preencherSelecionado() {
         int linha = tabela.getSelectedRow();
         if (linha < 0) return;
@@ -130,9 +154,11 @@ public class PetView extends JFrame {
         campoEspecie.setText(texto(modelo.getValueAt(linha, 2)));
         campoRaca.setText(texto(modelo.getValueAt(linha, 3)));
         campoNascimento.setText(texto(modelo.getValueAt(linha, 4)));
+        // A tabela mostra o NOME do tutor; aqui procuramos o item do combo com esse nome.
         selecionarTutorPorNome(texto(modelo.getValueAt(linha, 5)));
     }
 
+    /** Percorre o combo e seleciona o tutor cujo nome bate com o da tabela. */
     private void selecionarTutorPorNome(String nome) {
         for (int i = 0; i < comboTutor.getItemCount(); i++) {
             if (comboTutor.getItemAt(i).getNome().equals(nome)) {
@@ -142,10 +168,11 @@ public class PetView extends JFrame {
         }
     }
 
+    /** CREATE/UPDATE — valida, resolve o tutor escolhido e grava. */
     private void salvar() {
         String nome = campoNome.getText().trim();
         String especie = campoEspecie.getText().trim();
-        Tutor tutor = (Tutor) comboTutor.getSelectedItem();
+        Tutor tutor = (Tutor) comboTutor.getSelectedItem(); // o dono escolhido
         if (nome.isEmpty() || especie.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Nome e espécie são obrigatórios.");
             return;
@@ -159,7 +186,9 @@ public class PetView extends JFrame {
         p.setNome(nome);
         p.setEspecie(especie);
         p.setRaca(campoRaca.getText().trim());
-        p.setIdTutor(tutor.getId());
+        p.setIdTutor(tutor.getId()); // AQUI a FK é preenchida com o id do tutor escolhido
+
+        // Converte a data digitada. Se estiver preenchida mas inválida, avisa.
         LocalDate data = parseData(campoNascimento.getText().trim());
         if (data == null && !campoNascimento.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Data inválida. Use o formato aaaa-mm-dd.");
@@ -178,6 +207,7 @@ public class PetView extends JFrame {
         }
     }
 
+    /** DELETE — remove o pet selecionado, com confirmação. */
     private void excluir() {
         if (idSelecionado <= 0) {
             JOptionPane.showMessageDialog(this, "Selecione um pet na tabela.");
@@ -195,15 +225,17 @@ public class PetView extends JFrame {
         }
     }
 
+    /** Converte "aaaa-mm-dd" em LocalDate. Devolve null se vazio ou inválido. */
     private LocalDate parseData(String texto) {
         if (texto.isEmpty()) return null;
         try {
-            return LocalDate.parse(texto);
+            return LocalDate.parse(texto); // formato ISO padrão (2020-03-15)
         } catch (Exception e) {
             return null;
         }
     }
 
+    /** Zera seleção e campos (combo volta para o primeiro item). */
     private void limpar() {
         idSelecionado = 0;
         tabela.clearSelection();
@@ -218,7 +250,14 @@ public class PetView extends JFrame {
         return o == null ? "" : o.toString();
     }
 
-    /** Mostra o nome do tutor no combo, mas guarda o objeto inteiro (com o id para a FK). */
+    /**
+     * TutorRenderer — diz ao combo como DESENHAR cada item.
+     * Sem isso, o combo mostraria algo como "model.Tutor@1a2b3c". Com ele,
+     * mostramos o nome do tutor, mas o item guardado continua sendo o objeto
+     * Tutor completo (preservando o id para a FK).
+     *
+     * [MOLDE] Copie este renderer trocando Tutor pela sua entidade-pai.
+     */
     private static class TutorRenderer extends javax.swing.DefaultListCellRenderer {
         @Override
         public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> lista, Object valor,

@@ -3,19 +3,29 @@ package model;
 import java.time.LocalDateTime;
 
 /**
- * Transporta dado. Não abre conexão.
- * idPet e idVeterinario são campos de relacionamento (vão na FK).
- * nomePet e nomeVet são campos de exibição: vêm do JOIN.
+ * Consulta — model que liga DUAS tabelas ao mesmo tempo (pet + veterinário).
+ * Exemplo-mestre de entidade "de cruzamento" (uma agenda, um pedido, etc.).
+ *
+ * TEM DOIS PARES relacionamento+exibição:
+ *   - idPet (FK)         / nomePet (vem do JOIN)
+ *   - idVeterinario (FK) / nomeVet (vem do JOIN)
+ *
+ * dataHora usa LocalDateTime porque guarda DATA + HORA (ex.: 2026-10-20 09:00).
+ *   Compare com o Pet, que usa LocalDate (só data).
+ *
+ * [MOLDE] Para uma entidade que conecta duas outras (ex.: Matricula ->
+ *         Aluno + Turma, ItemPedido -> Pedido + Produto), copie este molde
+ *         com os dois pares de id + nome.
  */
 public class Consulta {
-    private int id;
-    private int idPet;
-    private int idVeterinario;
-    private LocalDateTime dataHora;
+    private int id;                    // id_consulta (chave primária)
+    private int idPet;                 // [MOLDE] FK para a 1ª tabela
+    private int idVeterinario;         // [MOLDE] FK para a 2ª tabela
+    private LocalDateTime dataHora;    // data + hora do agendamento
     private String motivo;
     private String observacao;
-    private String nomePet;
-    private String nomeVet;
+    private String nomePet;            // [MOLDE] exibição (JOIN): nome do pet
+    private String nomeVet;            // [MOLDE] exibição (JOIN): nome do veterinário
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
