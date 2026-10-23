@@ -5,6 +5,7 @@ public class Tutor {
     private String nome;
     private String telefone;
     private String email;
+    private String cpf;
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -14,4 +15,6 @@ public class Tutor {
     public void setTelefone(String telefone) { this.telefone = telefone; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
 }

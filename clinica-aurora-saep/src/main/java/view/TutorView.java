@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 import dao.TutorDAO;
@@ -27,15 +28,17 @@ public class TutorView extends JFrame {
     private final JTextField campoNome = new JTextField();
     private final JTextField campoTelefone = new JTextField();
     private final JTextField campoEmail = new JTextField();
+    private final JTextField campoCpf = new JTextField();
+    private int idSelecionado = 0;
     private final DefaultTableModel modelo = new DefaultTableModel(
-            new String[] { "ID", "Nome", "Telefone", "E-mail" }, 0) {
+            new String[] { "ID", "Nome", "Telefone", "E-mail", "CPF" }, 0) {
         @Override public boolean isCellEditable(int r, int c) { return false; }
     };
     private final JTable tabela = new JTable(modelo);
 
     public TutorView() {
         setTitle("Tutores");
-        setSize(720, 480);
+        setSize(760, 520);
         setLocationRelativeTo(null);
 
         JPanel busca = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -45,21 +48,32 @@ public class TutorView extends JFrame {
         busca.add(campoBusca);
         busca.add(btnBuscar);
 
-        JPanel form = new JPanel(new GridLayout(3, 2, 8, 8));
-        form.setBorder(BorderFactory.createTitledBorder("Novo tutor"));
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabela.getSelectionModel().addListSelectionListener(e -> preencherSelecionado());
+
+        JPanel form = new JPanel(new GridLayout(4, 2, 8, 8));
+        form.setBorder(BorderFactory.createTitledBorder("Dados do tutor"));
         form.add(new JLabel("Nome"));
         form.add(campoNome);
         form.add(new JLabel("Telefone"));
         form.add(campoTelefone);
         form.add(new JLabel("E-mail"));
         form.add(campoEmail);
+        form.add(new JLabel("CPF"));
+        form.add(campoCpf);
 
+        JButton btnNovo = new JButton("Novo");
         JButton btnSalvar = new JButton("Salvar");
+        JButton btnExcluir = new JButton("Excluir");
+        btnNovo.addActionListener(e -> limpar());
         btnSalvar.addActionListener(e -> salvar());
-        JPanel acoes = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnExcluir.addActionListener(e -> excluir());
+        JPanel acoes = new JPanel(new GridLayout(3, 1, 8, 8));
+        acoes.add(btnNovo);
         acoes.add(btnSalvar);
+        acoes.add(btnExcluir);
 
-        JLabel faixa = new JLabel("  ID é gerado pelo MySQL (AUTO_INCREMENT). Não se digita.");
+        JLabel faixa = new JLabel("  ID é gerado pelo MySQL (AUTO_INCREMENT). CPF é guardado criptografado (AES).");
         faixa.setOpaque(true);
         faixa.setBackground(new Color(232, 241, 248));
         faixa.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
@@ -82,8 +96,19 @@ public class TutorView extends JFrame {
         modelo.setRowCount(0);
         List<Tutor> lista = dao.listar(campoBusca.getText());
         for (Tutor t : lista) {
-            modelo.addRow(new Object[] { t.getId(), t.getNome(), t.getTelefone(), t.getEmail() });
+            modelo.addRow(new Object[] { t.getId(), t.getNome(), t.getTelefone(), t.getEmail(), t.getCpf() });
         }
+        limpar();
+    }
+
+    private void preencherSelecionado() {
+        int linha = tabela.getSelectedRow();
+        if (linha < 0) return;
+        idSelecionado = (int) modelo.getValueAt(linha, 0);
+        campoNome.setText(texto(modelo.getValueAt(linha, 1)));
+        campoTelefone.setText(texto(modelo.getValueAt(linha, 2)));
+        campoEmail.setText(texto(modelo.getValueAt(linha, 3)));
+        campoCpf.setText(texto(modelo.getValueAt(linha, 4)));
     }
 
     private void salvar() {
@@ -93,17 +118,50 @@ public class TutorView extends JFrame {
             return;
         }
         Tutor t = new Tutor();
+        t.setId(idSelecionado);
         t.setNome(nome);
         t.setTelefone(campoTelefone.getText().trim());
         t.setEmail(campoEmail.getText().trim());
+        t.setCpf(campoCpf.getText().trim());
         try {
-            dao.inserir(t);
-            campoNome.setText("");
-            campoTelefone.setText("");
-            campoEmail.setText("");
+            if (idSelecionado > 0) {
+                dao.atualizar(t);
+            } else {
+                dao.inserir(t);
+            }
             carregar();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Não gravou.\n" + ex.getMessage());
         }
+    }
+
+    private void excluir() {
+        if (idSelecionado <= 0) {
+            JOptionPane.showMessageDialog(this, "Selecione um tutor na tabela.");
+            return;
+        }
+        int ok = JOptionPane.showConfirmDialog(this, "Excluir o tutor selecionado?", "Confirmar",
+                JOptionPane.YES_NO_OPTION);
+        if (ok != JOptionPane.YES_OPTION) return;
+        try {
+            dao.excluir(idSelecionado);
+            carregar();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Não excluiu.\n" + ex.getMessage()
+                    + "\n(Tutor com pets cadastrados não pode ser excluído.)");
+        }
+    }
+
+    private void limpar() {
+        idSelecionado = 0;
+        tabela.clearSelection();
+        campoNome.setText("");
+        campoTelefone.setText("");
+        campoEmail.setText("");
+        campoCpf.setText("");
+    }
+
+    private String texto(Object o) {
+        return o == null ? "" : o.toString();
     }
 }
