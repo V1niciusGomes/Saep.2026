@@ -1,0 +1,14 @@
+# Pasta de build do Maven (arquivos compilados). Não vai para o versionamento.
+target/
+
+# Arquivos de IDEs
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db

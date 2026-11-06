@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+  pom.xml — arquivo de configuração do Maven (build e dependências).
+
+  O QUE É: o Maven lê este arquivo para saber como compilar o projeto e quais
+  bibliotecas baixar. Aqui só precisamos do driver do MySQL (o "tradutor" que
+  o Java usa para falar com o banco).
+
+  [MOLDE] Para renomear o projeto, troque <groupId>, <artifactId> e <name>.
+          Para usar outro banco (PostgreSQL, SQL Server...), troque a
+          <dependency> do mysql-connector pelo driver correspondente.
+  ============================================================================
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- [MOLDE] Identidade do projeto. Troque livremente. -->
+  <groupId>br.com.exemplo</groupId>
+  <artifactId>projeto-base</artifactId>
+  <version>1.0.0</version>
+  <name>Projeto Base — Esqueleto CRUD</name>
+
+  <properties>
+    <!-- Versão do Java usada para compilar. 17 é uma versão LTS estável. -->
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <!-- Acentuação correta no código-fonte. -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <!-- Driver JDBC do MySQL: permite ao Java abrir conexão com o banco. -->
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <version>8.4.0</version>
+    </dependency>
+  </dependencies>
+</project>
