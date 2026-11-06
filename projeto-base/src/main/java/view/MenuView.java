@@ -33,7 +33,7 @@ public class MenuView extends JFrame {
         setTitle("Projeto Base — Menu");                 // [MOLDE] nome do sistema
         // Fechar esta janela encerra o programa (é a janela "principal").
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(480, 360);
+        setSize(480, 460);
         setLocationRelativeTo(null); // centraliza na tela
 
         // ----- Faixa colorida do topo (cabeçalho visual) -----
@@ -51,25 +51,31 @@ public class MenuView extends JFrame {
         // ----- Botões do menu (um por cadastro) -----
         // [MOLDE] troque os textos e adicione/remova botões conforme seu sistema.
         JButton btnItens = new JButton("Itens (cadastro simples)");
-        JButton btnFilhos = new JButton("Itens Filhos (pertence a um item)");
+        JButton btnItensB = new JButton("Itens B (2º cadastro simples)");
+        JButton btnFilhos = new JButton("Itens Filhos (pertence a UM item)");
+        JButton btnLigacoes = new JButton("Ligações (molde da Ordem de Serviço)");
         JButton btnSair = new JButton("Sair");
 
         // Cada botão abre a tela correspondente. "new XView().setVisible(true)"
         // cria e mostra a janela do cadastro.
         btnItens.addActionListener(e -> new ItemView().setVisible(true));
+        btnItensB.addActionListener(e -> new ItemBView().setVisible(true));
         btnFilhos.addActionListener(e -> new ItemFilhoView().setVisible(true));
+        btnLigacoes.addActionListener(e -> new ItemLigacaoView().setVisible(true));
         // Sair: volta ao login e fecha o menu atual.
         btnSair.addActionListener(e -> {
             new LoginView().setVisible(true);
             dispose(); // fecha esta janela de menu
         });
 
-        // GridLayout(3,1): empilha os 3 botões em uma coluna.
+        // GridLayout(5,1): empilha os 5 botões em uma coluna.
         // [MOLDE] se adicionar botões, ajuste o número de linhas aqui.
-        JPanel botoes = new JPanel(new GridLayout(3, 1, 10, 10));
+        JPanel botoes = new JPanel(new GridLayout(5, 1, 10, 10));
         botoes.setBorder(BorderFactory.createEmptyBorder(24, 40, 24, 40));
         botoes.add(btnItens);
+        botoes.add(btnItensB);
         botoes.add(btnFilhos);
+        botoes.add(btnLigacoes);
         botoes.add(btnSair);
 
         // Monta a janela: topo no NORTE, botões no CENTRO.
