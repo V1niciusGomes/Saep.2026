@@ -8,6 +8,10 @@ técnica, loja, clínica, estoque, etc.
 Todo o código é **simples e muito comentado**. Procure pela marca `[MOLDE]`:
 ela indica exatamente os pontos que você deve trocar ao adaptar.
 
+> 📘 **É sua primeira vez alterando o projeto?** Leia o
+> **[GUIA_PASSO_A_PASSO.md](GUIA_PASSO_A_PASSO.md)** — um tutorial 100%
+> explicado, com ordem certa e exemplos prontos de cada tipo de classe/tabela.
+
 ---
 
 ## O que vem pronto
